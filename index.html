@@ -1,811 +1,190 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QuizZone 🎮</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0f0c29;
-    --card: #1a1535;
-    --card2: #221d42;
-    --accent1: #ff6b6b;
-    --accent2: #ffd93d;
-    --accent3: #6bcb77;
-    --accent4: #4d96ff;
-    --purple: #c77dff;
-    --text: #f0e6ff;
-    --muted: #9e8fc0;
-    --radius: 20px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Animated background */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background: radial-gradient(ellipse at 20% 20%, #3d1a78 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, #1a3a78 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, #0f0c29 0%, #0a0820 100%);
-    z-index: -1;
-  }
-
-  /* Stars */
-  .stars { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
-  .star {
-    position: absolute;
-    width: 3px; height: 3px;
-    background: white;
-    border-radius: 50%;
-    animation: twinkle 3s infinite;
-  }
-  @keyframes twinkle {
-    0%,100% { opacity: 0.2; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.5); }
-  }
-
-  /* ===== SCREENS ===== */
-  .screen { display: none; min-height: 100vh; }
-  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-
-  /* ===== LANDING ===== */
-  #landing { gap: 30px; text-align: center; }
-  .logo {
-    font-family: 'Fredoka One', cursive;
-    font-size: clamp(48px, 10vw, 90px);
-    background: linear-gradient(135deg, var(--accent2), var(--accent1), var(--purple));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 30px rgba(255,107,107,0.4));
-    animation: logoFloat 3s ease-in-out infinite;
-  }
-  @keyframes logoFloat {
-    0%,100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-  .tagline { font-size: 18px; color: var(--muted); font-weight: 600; }
-  .btn-group { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
-  
-  .btn {
-    font-family: 'Fredoka One', cursive;
-    font-size: 18px;
-    padding: 14px 36px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 1px;
-  }
-  .btn:active { transform: scale(0.95); }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent1), #ff4757);
-    color: white;
-    box-shadow: 0 6px 25px rgba(255,107,107,0.5);
-  }
-  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 35px rgba(255,107,107,0.6); }
-  .btn-secondary {
-    background: transparent;
-    color: var(--text);
-    border: 2px solid var(--purple);
-    box-shadow: 0 0 20px rgba(199,125,255,0.2);
-  }
-  .btn-secondary:hover { background: rgba(199,125,255,0.1); transform: translateY(-3px); }
-  .btn-success {
-    background: linear-gradient(135deg, var(--accent3), #2ecc71);
-    color: white;
-    box-shadow: 0 6px 25px rgba(107,203,119,0.4);
-  }
-  .btn-success:hover { transform: translateY(-3px); }
-  .btn-yellow {
-    background: linear-gradient(135deg, var(--accent2), #f9a825);
-    color: #1a1535;
-    box-shadow: 0 6px 25px rgba(255,217,61,0.4);
-  }
-  .btn-yellow:hover { transform: translateY(-3px); }
-  .btn-blue {
-    background: linear-gradient(135deg, var(--accent4), #2980b9);
-    color: white;
-    box-shadow: 0 6px 25px rgba(77,150,255,0.4);
-  }
-  .btn-blue:hover { transform: translateY(-3px); }
-
-  /* ===== CARD ===== */
-  .card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 40px;
-    border: 1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    width: 100%; max-width: 440px;
-    animation: slideUp 0.4s ease;
-  }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .card h2 {
-    font-family: 'Fredoka One', cursive;
-    font-size: 30px;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, var(--text), var(--purple));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .card p.subtitle { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
-
-  /* ===== FORM ===== */
-  .field { margin-bottom: 18px; }
-  .field label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 1px; }
-  .field input {
-    width: 100%; padding: 14px 18px;
-    background: var(--card2);
-    border: 2px solid rgba(255,255,255,0.08);
-    border-radius: 14px;
-    color: var(--text);
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    transition: border-color 0.2s;
-    outline: none;
-  }
-  .field input:focus { border-color: var(--purple); }
-  .field input::placeholder { color: var(--muted); font-weight: 400; }
-
-  .error-msg {
-    background: rgba(255,71,87,0.15);
-    border: 1px solid rgba(255,71,87,0.4);
-    color: var(--accent1);
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 14px;
-    display: none;
-  }
-  .success-msg {
-    background: rgba(107,203,119,0.15);
-    border: 1px solid rgba(107,203,119,0.4);
-    color: var(--accent3);
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 14px;
-    display: none;
-  }
-
-  .link-text { text-align: center; font-size: 13px; color: var(--muted); margin-top: 18px; }
-  .link-text a { color: var(--purple); cursor: pointer; font-weight: 700; text-decoration: none; }
-  .link-text a:hover { text-decoration: underline; }
-
-  /* ===== HOME / DASHBOARD ===== */
-  #home { justify-content: flex-start; padding-top: 0; }
-  .topbar {
-    width: 100%; display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 24px;
-    background: rgba(26,21,53,0.8);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    position: sticky; top: 0; z-index: 100;
-  }
-  .topbar-logo { font-family: 'Fredoka One', cursive; font-size: 24px; color: var(--accent2); }
-  .topbar-user { display: flex; align-items: center; gap: 10px; }
-  .avatar {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent1), var(--purple));
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Fredoka One', cursive; font-size: 16px; color: white;
-  }
-  .username-display { font-weight: 700; font-size: 14px; }
-  .btn-logout { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; font-family: 'Nunito', sans-serif; font-weight: 700; }
-  .btn-logout:hover { color: var(--accent1); }
-
-  .home-content { width: 100%; max-width: 860px; padding: 30px 20px; }
-  .welcome-banner {
-    background: linear-gradient(135deg, #2d1b69, #1a1535);
-    border: 1px solid rgba(199,125,255,0.2);
-    border-radius: var(--radius);
-    padding: 28px 32px;
-    margin-bottom: 30px;
-    position: relative; overflow: hidden;
-  }
-  .welcome-banner::after {
-    content: '🎮';
-    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-    font-size: 64px; opacity: 0.15;
-  }
-  .welcome-banner h3 { font-family: 'Fredoka One', cursive; font-size: 22px; margin-bottom: 4px; color: var(--accent2); }
-  .welcome-banner p { color: var(--muted); font-size: 14px; }
-  
-  .score-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(255,217,61,0.15); border: 1px solid rgba(255,217,61,0.3);
-    border-radius: 50px; padding: 4px 14px; font-size: 13px; font-weight: 800;
-    color: var(--accent2); margin-top: 12px;
-  }
-
-  .section-title {
-    font-family: 'Fredoka One', cursive;
-    font-size: 22px; color: var(--text);
-    margin-bottom: 16px;
-    display: flex; align-items: center; gap: 8px;
-  }
-
-  .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin-bottom: 30px; }
-  .game-card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 24px;
-    cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.06);
-    transition: all 0.25s;
-    position: relative; overflow: hidden;
-  }
-  .game-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.15); }
-  .game-card::before {
-    content: ''; position: absolute; inset: 0;
-    background: var(--game-color, rgba(255,107,107,0.05));
-    z-index: 0;
-  }
-  .game-card > * { position: relative; z-index: 1; }
-  .game-icon { font-size: 42px; margin-bottom: 12px; display: block; }
-  .game-card h3 { font-family: 'Fredoka One', cursive; font-size: 20px; margin-bottom: 6px; }
-  .game-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
-  .game-tag {
-    display: inline-block; padding: 3px 10px; border-radius: 50px;
-    font-size: 11px; font-weight: 800; letter-spacing: 1px;
-    margin-top: 12px; text-transform: uppercase;
-  }
-
-  /* ===== GAME SCREEN ===== */
-  #game { justify-content: flex-start; }
-  .game-topbar {
-    width: 100%; display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 20px;
-    background: rgba(26,21,53,0.9);
-    backdrop-filter: blur(10px);
-  }
-  .game-title-bar { font-family: 'Fredoka One', cursive; font-size: 18px; }
-  .game-meta { display: flex; align-items: center; gap: 14px; font-size: 13px; font-weight: 800; }
-  .timer-badge {
-    background: rgba(255,107,107,0.2);
-    border: 1px solid rgba(255,107,107,0.4);
-    color: var(--accent1);
-    padding: 4px 14px; border-radius: 50px;
-    font-family: 'Fredoka One', cursive; font-size: 18px;
-  }
-  .timer-badge.warning { animation: pulse 0.5s infinite; }
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-  .score-display { color: var(--accent2); }
-
-  .game-content { width: 100%; max-width: 680px; padding: 30px 20px; }
-  .progress-bar-wrap { background: rgba(255,255,255,0.1); border-radius: 50px; height: 8px; margin-bottom: 24px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; border-radius: 50px; background: linear-gradient(90deg, var(--accent4), var(--purple)); transition: width 0.4s; }
-
-  .question-card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 30px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(255,255,255,0.08);
-    animation: slideUp 0.3s ease;
-  }
-  .q-number { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
-  .q-text { font-size: clamp(17px, 3vw, 22px); font-weight: 800; line-height: 1.4; }
-  .q-emoji { font-size: 36px; margin-bottom: 12px; display: block; }
-
-  .options-grid { display: grid; gap: 12px; }
-  .option-btn {
-    background: var(--card2);
-    border: 2px solid rgba(255,255,255,0.08);
-    border-radius: 14px;
-    padding: 16px 20px;
-    text-align: left;
-    cursor: pointer;
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-    transition: all 0.2s;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .option-btn:hover:not(:disabled) { border-color: var(--purple); background: rgba(199,125,255,0.1); transform: translateX(4px); }
-  .option-btn.correct { background: rgba(107,203,119,0.2); border-color: var(--accent3); color: var(--accent3); }
-  .option-btn.wrong { background: rgba(255,107,107,0.2); border-color: var(--accent1); color: var(--accent1); }
-  .option-btn:disabled { cursor: default; }
-  .opt-letter {
-    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-    background: rgba(255,255,255,0.08);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Fredoka One', cursive; font-size: 14px;
-  }
-
-  /* ===== RESULT ===== */
-  #result { gap: 24px; text-align: center; }
-  .result-emoji { font-size: 80px; animation: pop 0.5s ease; }
-  @keyframes pop { 0% { transform: scale(0); } 80% { transform: scale(1.2); } 100% { transform: scale(1); } }
-  .result-card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 36px;
-    width: 100%; max-width: 440px;
-    border: 1px solid rgba(255,255,255,0.08);
-    animation: slideUp 0.4s ease;
-  }
-  .result-card h2 { font-family: 'Fredoka One', cursive; font-size: 32px; margin-bottom: 6px; }
-  .result-score {
-    font-family: 'Fredoka One', cursive;
-    font-size: 64px;
-    background: linear-gradient(135deg, var(--accent2), var(--accent1));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    margin: 10px 0;
-  }
-  .result-detail { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
-  .stars-display { font-size: 32px; margin-bottom: 8px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizZone 🎮</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="stars" id="stars"></div>
 
-<div class="stars" id="stars"></div>
-
-<!-- LANDING -->
-<div class="screen active" id="landing">
-  <div class="logo">QuizZone ⚡</div>
-  <p class="tagline">O quiz mais divertido para você e seus amigos!</p>
-  <div class="btn-group">
-    <button class="btn btn-primary" onclick="showScreen('login')">🔑 Entrar</button>
-    <button class="btn btn-secondary" onclick="showScreen('register')">✨ Criar conta</button>
-  </div>
-  <p style="color:var(--muted); font-size:12px; margin-top:20px;">Mais de 150 perguntas em 4 categorias!</p>
-</div>
-
-<!-- REGISTER -->
-<div class="screen" id="register">
-  <div class="card">
-    <h2>Criar conta 🚀</h2>
-    <p class="subtitle">Junte-se à comunidade QuizZone!</p>
-    <div class="error-msg" id="reg-error"></div>
-    <div class="success-msg" id="reg-success"></div>
-    <div class="field"><label>Seu nome</label><input type="text" id="reg-name" placeholder="Como te chamam?"></div>
-    <div class="field"><label>Usuário</label><input type="text" id="reg-user" placeholder="Ex: gamer_star123"></div>
-    <div class="field"><label>Senha</label><input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres"></div>
-    <div class="field"><label>Confirmar senha</label><input type="password" id="reg-pass2" placeholder="Repita a senha"></div>
-    <button class="btn btn-primary" style="width:100%" onclick="doRegister()">Criar minha conta 🎉</button>
-    <p class="link-text">Já tem conta? <a onclick="showScreen('login')">Fazer login</a></p>
-    <p class="link-text"><a onclick="showScreen('landing')">← Voltar</a></p>
-  </div>
-</div>
-
-<!-- LOGIN -->
-<div class="screen" id="login">
-  <div class="card">
-    <h2>Bem-vindo de volta 👋</h2>
-    <p class="subtitle">Entre na sua conta para jogar!</p>
-    <div class="error-msg" id="log-error"></div>
-    <div class="field"><label>Usuário</label><input type="text" id="log-user" placeholder="Seu usuário"></div>
-    <div class="field"><label>Senha</label><input type="password" id="log-pass" placeholder="Sua senha"></div>
-    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Jogar agora! 🎮</button>
-    <p class="link-text">Não tem conta? <a onclick="showScreen('register')">Criar agora</a></p>
-    <p class="link-text"><a onclick="showScreen('landing')">← Voltar</a></p>
-  </div>
-</div>
-
-<!-- HOME -->
-<div class="screen" id="home">
-  <div class="topbar">
-    <div class="topbar-logo">QuizZone ⚡</div>
-    <div class="topbar-user">
-      <div class="avatar" id="avatar-letter">?</div>
-      <span class="username-display" id="display-username">Jogador</span>
-      <button class="btn-logout" onclick="doLogout()">Sair</button>
+  <!-- LANDING SCREEN -->
+  <section id="landing" class="screen active">
+    <h1 class="logo">QuizZone</h1>
+    <p class="tagline">O desafio definitivo para sua mente! 🚀</p>
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="showScreen('login')">ENTRAR</button>
+      <button class="btn btn-secondary" onclick="showScreen('register')">CRIAR CONTA</button>
     </div>
-  </div>
-  <div class="home-content">
-    <div class="welcome-banner">
-      <h3>Olá, <span id="welcome-name">Jogador</span>! 🔥</h3>
-      <p>Escolha um quiz e mostre o que você sabe!</p>
-      <div class="score-badge">⭐ Pontos totais: <span id="total-score">0</span></div>
-    </div>
+  </section>
 
-    <div class="section-title">🎮 Escolha um Quiz</div>
-    <div class="games-grid">
-      <div class="game-card" style="--game-color: rgba(255,107,107,0.08)" onclick="startGame('cultura')">
-        <span class="game-icon">🌍</span>
-        <h3>Cultura Geral</h3>
-        <p>Teste seus conhecimentos sobre o mundo, história e atualidades!</p>
-        <span class="game-tag" style="background:rgba(255,107,107,0.2);color:var(--accent1)">10 perguntas</span>
+  <!-- LOGIN SCREEN -->
+  <section id="login" class="screen">
+    <div class="card">
+      <h2>Bem-vindo de volta!</h2>
+      <p class="subtitle">Faça login para salvar seu progresso.</p>
+      <div id="log-error" class="error-msg"></div>
+      <div class="field">
+        <label>Usuário</label>
+        <input type="text" id="log-user" placeholder="Seu usuário">
       </div>
-      <div class="game-card" style="--game-color: rgba(255,217,61,0.08)" onclick="startGame('ciencias')">
-        <span class="game-icon">🔬</span>
-        <h3>Ciências & Natureza</h3>
-        <p>Espaço, animais, biologia e descobertas incríveis!</p>
-        <span class="game-tag" style="background:rgba(255,217,61,0.2);color:var(--accent2)">10 perguntas</span>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="log-pass" placeholder="••••••••">
       </div>
-      <div class="game-card" style="--game-color: rgba(107,203,119,0.08)" onclick="startGame('games')">
-        <span class="game-icon">🕹️</span>
-        <h3>Mundo dos Games</h3>
-        <p>Você conhece os maiores jogos e personagens do universo gamer?</p>
-        <span class="game-tag" style="background:rgba(107,203,119,0.2);color:var(--accent3)">10 perguntas</span>
+      <button class="btn btn-primary" style="width:100%" onclick="doLogin()">ENTRAR</button>
+      <p class="link-text">Não tem conta? <a onclick="showScreen('register')">Cadastre-se</a></p>
+      <p class="link-text"><a onclick="showScreen('landing')">Voltar ao início</a></p>
+    </div>
+  </section>
+
+  <!-- REGISTER SCREEN -->
+  <section id="register" class="screen">
+    <div class="card">
+      <h2>Criar Conta</h2>
+      <p class="subtitle">Junte-se a milhares de jogadores!</p>
+      <div id="reg-error" class="error-msg"></div>
+      <div id="reg-success" class="success-msg"></div>
+      <div class="field">
+        <label>Nome Completo</label>
+        <input type="text" id="reg-name" placeholder="Como quer ser chamado?">
       </div>
-      <div class="game-card" style="--game-color: rgba(77,150,255,0.08)" onclick="startGame('pop')">
-        <span class="game-icon">🎵</span>
-        <h3>Cultura Pop</h3>
-        <p>Músicas, filmes, séries e tudo que está em alta!</p>
-        <span class="game-tag" style="background:rgba(77,150,255,0.2);color:var(--accent4)">10 perguntas</span>
+      <div class="field">
+        <label>Usuário</label>
+        <input type="text" id="reg-user" placeholder="Ex: player123">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="field">
+        <label>Confirmar Senha</label>
+        <input type="password" id="reg-pass2" placeholder="Repita a senha">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="doRegister()">CADASTRAR</button>
+      <p class="link-text">Já tem conta? <a onclick="showScreen('login')">Fazer login</a></p>
+    </div>
+  </section>
+
+  <!-- HOME / DASHBOARD -->
+  <section id="home" class="screen">
+    <div class="topbar">
+      <div class="topbar-logo">QuizZone</div>
+      <div class="topbar-user">
+        <div class="avatar" id="avatar-letter">M</div>
+        <div style="display:flex;flex-direction:column">
+          <span class="username-display" id="display-username">username</span>
+          <button class="btn-logout" onclick="doLogout()">Sair</button>
+        </div>
       </div>
     </div>
 
-    <div class="section-title">🏆 Seu Histórico</div>
-    <div id="history-list" style="color:var(--muted); font-size:14px; background:var(--card); border-radius:14px; padding:20px; border:1px solid rgba(255,255,255,0.06)">
-      Nenhuma partida jogada ainda. Comece agora!
+    <div class="home-content">
+      <div class="welcome-banner">
+        <h3>Olá, <span id="welcome-name">Jogador</span>!</h3>
+        <p>Pronto para subir no ranking hoje?</p>
+        <div class="score-badge">🏆 <span id="total-score">0</span> PONTOS TOTAIS</div>
+      </div>
+
+      <h2 class="section-title">Escolha um Desafio</h2>
+      <div class="games-grid">
+        <div class="game-card" style="--game-color: rgba(255,217,61,0.1)" onclick="startGame('cultura')">
+          <span class="game-icon">🌍</span>
+          <h3>Cultura Geral</h3>
+          <p>História, geografia e conhecimentos do mundo.</p>
+          <span class="game-tag" style="background:var(--accent2);color:#1a1535">Popular</span>
+        </div>
+        <div class="game-card" style="--game-color: rgba(107,203,119,0.1)" onclick="startGame('ciencias')">
+          <span class="game-icon">🔬</span>
+          <h3>Ciências</h3>
+          <p>Natureza, corpo humano e o universo.</p>
+          <span class="game-tag" style="background:var(--accent3);color:white">Educativo</span>
+        </div>
+        <div class="game-card" style="--game-color: rgba(77,150,255,0.1)" onclick="startGame('games')">
+          <span class="game-icon">🕹️</span>
+          <h3>Mundo Gamer</h3>
+          <p>Consoles, personagens e história dos jogos.</p>
+          <span class="game-tag" style="background:var(--accent4);color:white">Divertido</span>
+        </div>
+        <div class="game-card" style="--game-color: rgba(199,125,255,0.1)" onclick="startGame('pop')">
+          <span class="game-icon">🎵</span>
+          <h3>Cultura Pop</h3>
+          <p>Filmes, séries, música e celebridades.</p>
+          <span class="game-tag" style="background:var(--purple);color:white">Trend</span>
+        </div>
+      </div>
+
+      <h2 class="section-title">Últimas Partidas</h2>
+      <div class="card" style="max-width:100%; padding:20px" id="history-list">
+        <!-- History items here -->
+      </div>
     </div>
-  </div>
-</div>
+  </section>
 
-<!-- GAME -->
-<div class="screen" id="game">
-  <div class="game-topbar">
-    <div class="game-title-bar" id="game-title-bar">Quiz</div>
-    <div class="game-meta">
-      <span class="score-display">⭐ <span id="game-score">0</span></span>
-      <span class="timer-badge" id="timer-display">15</span>
-      <button class="btn btn-secondary" style="padding:8px 18px; font-size:14px" onclick="showScreen('home')">✕ Sair</button>
+  <!-- GAME SCREEN -->
+  <section id="game" class="screen">
+    <div class="game-topbar">
+      <div class="game-title-bar" id="game-title-bar">Categoria</div>
+      <div class="game-meta">
+        <div class="timer-badge" id="timer-display">15</div>
+        <div class="score-display">✨ <span id="game-score">0</span></div>
+      </div>
     </div>
-  </div>
-  <div class="game-content">
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+
+    <div class="game-content">
+      <div class="q-card">
+        <div class="q-header">
+          <span class="q-num" id="q-number">Pergunta 1 de 10</span>
+          <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+        </div>
+        <div class="q-body">
+          <span class="q-emoji" id="q-emoji">❓</span>
+          <h2 class="q-text" id="q-text">Carregando pergunta...</h2>
+          <div class="options-grid" id="options-grid">
+            <!-- Options here -->
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="question-card">
-      <div class="q-number" id="q-number">Pergunta 1 de 10</div>
-      <span class="q-emoji" id="q-emoji">❓</span>
-      <div class="q-text" id="q-text">Carregando...</div>
+  </section>
+
+  <!-- RESULT SCREEN -->
+  <section id="result" class="screen">
+    <div class="card">
+      <div class="result-emoji" id="result-emoji">🏆</div>
+      <h2 id="result-title">Incrível!</h2>
+      <div class="result-stars" id="result-stars">⭐⭐⭐</div>
+      
+      <div class="result-score">
+        <span class="result-score-num" id="result-score-num">0</span>
+        <span class="result-score-label" id="result-detail">pontos</span>
+      </div>
+
+      <div class="btn-group" style="flex-direction:column; width:100%">
+        <button class="btn btn-primary" style="width:100%" onclick="restartGame()">JOGAR NOVAMENTE</button>
+        <button class="btn btn-secondary" style="width:100%" onclick="loadHome()">VOLTAR AO INÍCIO</button>
+      </div>
     </div>
-    <div class="options-grid" id="options-grid"></div>
-  </div>
-</div>
+  </section>
 
-<!-- RESULT -->
-<div class="screen" id="result">
-  <div class="result-emoji" id="result-emoji">🏆</div>
-  <div class="result-card">
-    <div class="stars-display" id="result-stars">⭐⭐⭐</div>
-    <h2 id="result-title">Incrível!</h2>
-    <div class="result-score" id="result-score-num">1000</div>
-    <div class="result-detail" id="result-detail">pontos</div>
-    <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center">
-      <button class="btn btn-yellow" onclick="restartGame()">🔁 Jogar de novo</button>
-      <button class="btn btn-secondary" onclick="showScreen('home')">🏠 Início</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ===== STARS =====
-(function() {
-  const c = document.getElementById('stars');
-  for (let i = 0; i < 60; i++) {
-    const s = document.createElement('div');
-    s.className = 'star';
-    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s;opacity:${Math.random()*0.6+0.2}`;
-    c.appendChild(s);
-  }
-})();
-
-// ===== DATABASE (localStorage) =====
-const DB = {
-  getUsers() { return JSON.parse(localStorage.getItem('qz_users') || '{}'); },
-  saveUsers(u) { localStorage.setItem('qz_users', JSON.stringify(u)); },
-  getSession() { return localStorage.getItem('qz_session') || null; },
-  saveSession(u) { localStorage.setItem('qz_session', u); },
-  clearSession() { localStorage.removeItem('qz_session'); },
-  getHistory(user) {
-    const all = JSON.parse(localStorage.getItem('qz_history') || '{}');
-    return all[user] || [];
-  },
-  addHistory(user, entry) {
-    const all = JSON.parse(localStorage.getItem('qz_history') || '{}');
-    if (!all[user]) all[user] = [];
-    all[user].unshift(entry);
-    if (all[user].length > 10) all[user].pop();
-    localStorage.setItem('qz_history', JSON.stringify(all));
-  }
-};
-
-// ===== QUESTIONS =====
-const QUESTIONS = {
-  cultura: [
-    { e:'🌎', q:'Qual é a capital do Brasil?', o:['Brasília','São Paulo','Rio de Janeiro','Salvador'], a:0 },
-    { e:'📚', q:'Quem escreveu "Dom Casmurro"?', o:['José de Alencar','Machado de Assis','Carlos Drummond','Clarice Lispector'], a:1 },
-    { e:'🗺️', q:'Qual é o maior país do mundo em área?', o:['China','Canadá','Rússia','EUA'], a:2 },
-    { e:'🏛️', q:'Qual civilização construiu as pirâmides de Gizé?', o:['Romana','Grega','Egípcia','Mesopotâmica'], a:2 },
-    { e:'🎨', q:'Quem pintou a Mona Lisa?', o:['Michelangelo','Rafael','Leonardo da Vinci','Picasso'], a:2 },
-    { e:'🌊', q:'Qual é o maior oceano do mundo?', o:['Atlântico','Índico','Ártico','Pacífico'], a:3 },
-    { e:'⚽', q:'Qual país ganhou mais Copas do Mundo de futebol?', o:['Argentina','Alemanha','Brasil','Itália'], a:2 },
-    { e:'🔭', q:'Quem foi o primeiro humano a ir ao espaço?', o:['Neil Armstrong','Buzz Aldrin','Yuri Gagarin','Alan Shepard'], a:2 },
-    { e:'🎭', q:'Quem escreveu "Romeu e Julieta"?', o:['Victor Hugo','Shakespeare','Cervantes','Dante'], a:1 },
-    { e:'💡', q:'Quem inventou a lâmpada elétrica?', o:['Nikola Tesla','Benjamin Franklin','Thomas Edison','Albert Einstein'], a:2 },
-  ],
-  ciencias: [
-    { e:'🪐', q:'Qual é o maior planeta do sistema solar?', o:['Saturno','Netuno','Urano','Júpiter'], a:3 },
-    { e:'🧬', q:'Qual molécula carrega as informações genéticas?', o:['RNA','ATP','DNA','Proteína'], a:2 },
-    { e:'💧', q:'Qual é a fórmula química da água?', o:['CO2','H2O','NaCl','O2'], a:1 },
-    { e:'🦕', q:'Há quantos anos os dinossauros se extinguiram?', o:['6 mil anos','6 milhões','65 milhões','650 mil'], a:2 },
-    { e:'⚛️', q:'Qual é o elemento mais abundante no universo?', o:['Oxigênio','Carbono','Hélio','Hidrogênio'], a:3 },
-    { e:'🌡️', q:'A que temperatura a água ferve ao nível do mar?', o:['90°C','95°C','100°C','110°C'], a:2 },
-    { e:'🦁', q:'Qual é o animal terrestre mais rápido?', o:['Leão','Guepardo','Cavalo','Avestruz'], a:1 },
-    { e:'🌙', q:'Quantos dias a Lua leva para orbitar a Terra?', o:['7 dias','14 dias','28 dias','365 dias'], a:2 },
-    { e:'🧠', q:'Qual órgão controla o sistema nervoso?', o:['Coração','Pulmão','Fígado','Cérebro'], a:3 },
-    { e:'☀️', q:'Quantos planetas existem no sistema solar?', o:['7','8','9','10'], a:1 },
-  ],
-  games: [
-    { e:'🎮', q:'Em qual jogo aparece o personagem Mario?', o:['Sonic','Zelda','Super Mario','Pokémon'], a:2 },
-    { e:'🟡', q:'Em Pac-Man, qual é o objetivo principal?', o:['Destruir inimigos','Comer fantasmas','Comer pontos e fugir','Construir labirintos'], a:2 },
-    { e:'🔴', q:'Qual jogo tem o personagem Kratos?', o:['Halo','God of War','The Witcher','Dark Souls'], a:1 },
-    { e:'🎯', q:'Qual é o jogo Battle Royale mais famoso do mundo?', o:['PUBG','Warzone','Fortnite','Apex Legends'], a:2 },
-    { e:'🏎️', q:'Em qual jogo você pode construir qualquer coisa com blocos?', o:['Roblox','Minecraft','Terraria','Fortnite'], a:1 },
-    { e:'🎲', q:'Qual empresa criou o Playstation?', o:['Microsoft','Nintendo','Sega','Sony'], a:3 },
-    { e:'🌟', q:'Qual é a série de RPG mais vendida de todos os tempos?', o:['Final Fantasy','Pokémon','Dragon Quest','The Elder Scrolls'], a:1 },
-    { e:'🕹️', q:'Em League of Legends, como se chama a moeda do jogo?', o:['Gold','Coins','Essence','Gems'], a:0 },
-    { e:'🐉', q:'Qual personagem é o protagonista de The Legend of Zelda?', o:['Zelda','Ganon','Link','Epona'], a:2 },
-    { e:'🎪', q:'Qual jogo tem como lema "Catch \'em all"?', o:['Digimon','Temtem','Coromon','Pokémon'], a:3 },
-  ],
-  pop: [
-    { e:'🎵', q:'Qual artista lançou o álbum "Renaissance"?', o:['Rihanna','Beyoncé','Adele','Taylor Swift'], a:1 },
-    { e:'🎬', q:'Qual filme tem a frase "Que a força esteja com você"?', o:['Star Trek','Avatar','Star Wars','Interestelar'], a:2 },
-    { e:'📺', q:'Qual série tem os personagens Mike, Eleven e Dustin?', o:['Dark','La Casa de Papel','Stranger Things','The Witcher'], a:2 },
-    { e:'🎤', q:'Qual cantor é conhecido como "Rei do Pop"?', o:['Elvis Presley','Prince','David Bowie','Michael Jackson'], a:3 },
-    { e:'🦸', q:'Qual super-herói é conhecido como o "Homem de Ferro"?', o:['Steve Rogers','Tony Stark','Bruce Banner','Clint Barton'], a:1 },
-    { e:'🎶', q:'De qual país é o grupo BTS?', o:['Japão','China','Coreia do Sul','Tailândia'], a:2 },
-    { e:'🏆', q:'Qual série ganhou mais Emmy Awards seguidos?', o:['Breaking Bad','The Wire','Game of Thrones','Succession'], a:2 },
-    { e:'🎭', q:'Qual artista é conhecida como "Mother Monster"?', o:['Katy Perry','Lady Gaga','Ariana Grande','Billie Eilish'], a:1 },
-    { e:'🌊', q:'Qual filme animado tem como personagem Moana?', o:['Frozen','Encanto','Moana','Luca'], a:2 },
-    { e:'🎸', q:'Qual banda gravou "Bohemian Rhapsody"?', o:['Led Zeppelin','The Beatles','Queen','Rolling Stones'], a:2 },
-  ]
-};
-
-const GAME_NAMES = { cultura:'Cultura Geral', ciencias:'Ciências & Natureza', games:'Mundo dos Games', pop:'Cultura Pop' };
-const GAME_EMOJIS = { cultura:'🌍', ciencias:'🔬', games:'🕹️', pop:'🎵' };
-
-// ===== STATE =====
-let currentUser = null;
-let currentGame = null;
-let currentQ = 0;
-let score = 0;
-let timer = null;
-let timeLeft = 15;
-let answered = false;
-let currentCategory = '';
-
-// ===== UTILS =====
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function showError(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg; el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 3500);
-}
-function showSuccess(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg; el.style.display = 'block';
-}
-
-// ===== AUTH =====
-function doRegister() {
-  const name = document.getElementById('reg-name').value.trim();
-  const user = document.getElementById('reg-user').value.trim().toLowerCase();
-  const pass = document.getElementById('reg-pass').value;
-  const pass2 = document.getElementById('reg-pass2').value;
-
-  if (!name || !user || !pass) return showError('reg-error','Preencha todos os campos!');
-  if (user.length < 3) return showError('reg-error','Usuário deve ter pelo menos 3 caracteres!');
-  if (pass.length < 6) return showError('reg-error','Senha deve ter pelo menos 6 caracteres!');
-  if (pass !== pass2) return showError('reg-error','As senhas não conferem!');
-
-  const users = DB.getUsers();
-  if (users[user]) return showError('reg-error','Esse usuário já existe!');
-
-  users[user] = { name, pass, totalScore: 0 };
-  DB.saveUsers(users);
-  showSuccess('reg-success','Conta criada! Faça login agora 🎉');
-  setTimeout(() => {
-    document.getElementById('log-user').value = user;
-    showScreen('login');
-  }, 1500);
-}
-
-function doLogin() {
-  const user = document.getElementById('log-user').value.trim().toLowerCase();
-  const pass = document.getElementById('log-pass').value;
-
-  if (!user || !pass) return showError('log-error','Preencha usuário e senha!');
-  const users = DB.getUsers();
-  if (!users[user]) return showError('log-error','Usuário não encontrado!');
-  if (users[user].pass !== pass) return showError('log-error','Senha incorreta!');
-
-  currentUser = user;
-  DB.saveSession(user);
-  loadHome();
-}
-
-function doLogout() {
-  currentUser = null;
-  DB.clearSession();
-  showScreen('landing');
-}
-
-function loadHome() {
-  const users = DB.getUsers();
-  const u = users[currentUser];
-  document.getElementById('avatar-letter').textContent = u.name[0].toUpperCase();
-  document.getElementById('display-username').textContent = currentUser;
-  document.getElementById('welcome-name').textContent = u.name.split(' ')[0];
-  document.getElementById('total-score').textContent = u.totalScore || 0;
-  loadHistory();
-  showScreen('home');
-}
-
-function loadHistory() {
-  const hist = DB.getHistory(currentUser);
-  const el = document.getElementById('history-list');
-  if (!hist.length) { el.innerHTML = '<span style="color:var(--muted)">Nenhuma partida ainda. Comece agora!</span>'; return; }
-  el.innerHTML = hist.map(h => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span>${GAME_EMOJIS[h.cat]} <strong>${GAME_NAMES[h.cat]}</strong></span>
-      <span style="color:var(--accent2);font-weight:800">${h.score} pts</span>
-      <span style="color:var(--muted);font-size:12px">${h.date}</span>
-    </div>
-  `).join('');
-}
-
-// ===== GAME =====
-function startGame(category) {
-  currentCategory = category;
-  currentGame = [...QUESTIONS[category]].sort(() => Math.random() - 0.5);
-  currentQ = 0; score = 0; answered = false;
-  document.getElementById('game-title-bar').textContent = `${GAME_EMOJIS[category]} ${GAME_NAMES[category]}`;
-  showScreen('game');
-  renderQuestion();
-}
-
-function restartGame() { startGame(currentCategory); }
-
-function renderQuestion() {
-  answered = false;
-  const q = currentGame[currentQ];
-  const total = currentGame.length;
-  document.getElementById('q-number').textContent = `Pergunta ${currentQ + 1} de ${total}`;
-  document.getElementById('q-emoji').textContent = q.e;
-  document.getElementById('q-text').textContent = q.q;
-  document.getElementById('progress-bar').style.width = `${(currentQ / total) * 100}%`;
-  document.getElementById('game-score').textContent = score;
-
-  const grid = document.getElementById('options-grid');
-  const letters = ['A','B','C','D'];
-  grid.innerHTML = q.o.map((opt, i) => `
-    <button class="option-btn" onclick="selectAnswer(${i})">
-      <span class="opt-letter">${letters[i]}</span> ${opt}
-    </button>
-  `).join('');
-
-  startTimer();
-}
-
-function startTimer() {
-  clearInterval(timer);
-  timeLeft = 15;
-  updateTimerDisplay();
-  timer = setInterval(() => {
-    timeLeft--;
-    updateTimerDisplay();
-    if (timeLeft <= 5) document.getElementById('timer-display').classList.add('warning');
-    if (timeLeft <= 0) { clearInterval(timer); timeExpired(); }
-  }, 1000);
-}
-
-function updateTimerDisplay() {
-  document.getElementById('timer-display').textContent = timeLeft;
-  if (timeLeft > 5) document.getElementById('timer-display').classList.remove('warning');
-}
-
-function timeExpired() {
-  if (answered) return;
-  answered = true;
-  const q = currentGame[currentQ];
-  const btns = document.querySelectorAll('.option-btn');
-  btns.forEach((b, i) => {
-    b.disabled = true;
-    if (i === q.a) b.classList.add('correct');
-  });
-  setTimeout(nextQuestion, 1500);
-}
-
-function selectAnswer(idx) {
-  if (answered) return;
-  answered = true;
-  clearInterval(timer);
-  const q = currentGame[currentQ];
-  const btns = document.querySelectorAll('.option-btn');
-  btns.forEach(b => b.disabled = true);
-
-  if (idx === q.a) {
-    btns[idx].classList.add('correct');
-    const bonus = Math.ceil(timeLeft / 15 * 100);
-    score += 100 + bonus;
-  } else {
-    btns[idx].classList.add('wrong');
-    btns[q.a].classList.add('correct');
-  }
-  document.getElementById('game-score').textContent = score;
-  setTimeout(nextQuestion, 1500);
-}
-
-function nextQuestion() {
-  currentQ++;
-  if (currentQ >= currentGame.length) {
-    endGame();
-  } else {
-    renderQuestion();
-  }
-}
-
-function endGame() {
-  clearInterval(timer);
-  const total = currentGame.length;
-  const maxScore = total * 200;
-  const pct = score / maxScore;
-
-  let emoji, title, stars;
-  if (pct >= 0.8) { emoji='🏆'; title='Incrível! Você arrasou!'; stars='⭐⭐⭐'; }
-  else if (pct >= 0.5) { emoji='😎'; title='Muito bem! Continue assim!'; stars='⭐⭐'; }
-  else { emoji='💪'; title='Pratique mais e melhore!'; stars='⭐'; }
-
-  document.getElementById('result-emoji').textContent = emoji;
-  document.getElementById('result-title').textContent = title;
-  document.getElementById('result-stars').textContent = stars;
-  document.getElementById('result-score-num').textContent = score;
-  document.getElementById('result-detail').textContent = `pontos em ${GAME_NAMES[currentCategory]}`;
-
-  // Save
-  const users = DB.getUsers();
-  users[currentUser].totalScore = (users[currentUser].totalScore || 0) + score;
-  DB.saveUsers(users);
-
-  const now = new Date();
-  DB.addHistory(currentUser, {
-    cat: currentCategory,
-    score,
-    date: now.toLocaleDateString('pt-BR')
-  });
-
-  showScreen('result');
-}
-
-// ===== INIT =====
-(function init() {
-  const session = DB.getSession();
-  if (session) {
-    const users = DB.getUsers();
-    if (users[session]) {
-      currentUser = session;
-      loadHome();
-      return;
-    }
-  }
-  showScreen('landing');
-})();
-</script>
+  <script>
+    // Star Background Generator
+    (function createStars() {
+      const container = document.getElementById('stars');
+      for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        container.appendChild(star);
+      }
+    })();
+  </script>
+  <script src="script.js"></script>
 </body>
 </html>
