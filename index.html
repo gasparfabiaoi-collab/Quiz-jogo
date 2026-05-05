@@ -1,190 +1,148 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuizZone 🎮</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizZone 🎮</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="stars" id="stars"></div>
 
-  <!-- LANDING SCREEN -->
-  <section id="landing" class="screen active">
-    <h1 class="logo">QuizZone</h1>
-    <p class="tagline">O desafio definitivo para sua mente! 🚀</p>
-    <div class="btn-group">
-      <button class="btn btn-primary" onclick="showScreen('login')">ENTRAR</button>
-      <button class="btn btn-secondary" onclick="showScreen('register')">CRIAR CONTA</button>
+<div class="stars" id="stars"></div>
+
+<!-- LANDING -->
+<div class="screen active" id="landing">
+  <div class="logo">QuizZone ⚡</div>
+  <p class="tagline">O quiz mais divertido para você e seus amigos!</p>
+  <div class="btn-group">
+    <button class="btn btn-primary" onclick="showScreen('login')">🔑 Entrar</button>
+    <button class="btn btn-secondary" onclick="showScreen('register')">✨ Criar conta</button>
+  </div>
+  <p style="color:var(--muted); font-size:12px; margin-top:20px;">Mais de 150 perguntas em 4 categorias!</p>
+</div>
+
+<!-- REGISTER -->
+<div class="screen" id="register">
+  <div class="card">
+    <h2>Criar conta 🚀</h2>
+    <p class="subtitle">Junte-se à comunidade QuizZone!</p>
+    <div class="error-msg" id="reg-error"></div>
+    <div class="success-msg" id="reg-success"></div>
+    <div class="field"><label>Seu nome</label><input type="text" id="reg-name" placeholder="Como te chamam?"></div>
+    <div class="field"><label>Usuário</label><input type="text" id="reg-user" placeholder="Ex: gamer_star123"></div>
+    <div class="field"><label>Senha</label><input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres"></div>
+    <div class="field"><label>Confirmar senha</label><input type="password" id="reg-pass2" placeholder="Repita a senha"></div>
+    <button class="btn btn-primary" style="width:100%" onclick="doRegister()">Criar minha conta 🎉</button>
+    <p class="link-text">Já tem conta? <a onclick="showScreen('login')">Fazer login</a></p>
+    <p class="link-text"><a onclick="showScreen('landing')">← Voltar</a></p>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="screen" id="login">
+  <div class="card">
+    <h2>Bem-vindo de volta 👋</h2>
+    <p class="subtitle">Entre na sua conta para jogar!</p>
+    <div class="error-msg" id="log-error"></div>
+    <div class="field"><label>Usuário</label><input type="text" id="log-user" placeholder="Seu usuário"></div>
+    <div class="field"><label>Senha</label><input type="password" id="log-pass" placeholder="Sua senha"></div>
+    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Jogar agora! 🎮</button>
+    <p class="link-text">Não tem conta? <a onclick="showScreen('register')">Criar agora</a></p>
+    <p class="link-text"><a onclick="showScreen('landing')">← Voltar</a></p>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="home">
+  <div class="topbar">
+    <div class="topbar-logo">QuizZone ⚡</div>
+    <div class="topbar-user">
+      <div class="avatar" id="avatar-letter">?</div>
+      <span class="username-display" id="display-username">Jogador</span>
+      <button class="btn-logout" onclick="doLogout()">Sair</button>
     </div>
-  </section>
-
-  <!-- LOGIN SCREEN -->
-  <section id="login" class="screen">
-    <div class="card">
-      <h2>Bem-vindo de volta!</h2>
-      <p class="subtitle">Faça login para salvar seu progresso.</p>
-      <div id="log-error" class="error-msg"></div>
-      <div class="field">
-        <label>Usuário</label>
-        <input type="text" id="log-user" placeholder="Seu usuário">
-      </div>
-      <div class="field">
-        <label>Senha</label>
-        <input type="password" id="log-pass" placeholder="••••••••">
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="doLogin()">ENTRAR</button>
-      <p class="link-text">Não tem conta? <a onclick="showScreen('register')">Cadastre-se</a></p>
-      <p class="link-text"><a onclick="showScreen('landing')">Voltar ao início</a></p>
-    </div>
-  </section>
-
-  <!-- REGISTER SCREEN -->
-  <section id="register" class="screen">
-    <div class="card">
-      <h2>Criar Conta</h2>
-      <p class="subtitle">Junte-se a milhares de jogadores!</p>
-      <div id="reg-error" class="error-msg"></div>
-      <div id="reg-success" class="success-msg"></div>
-      <div class="field">
-        <label>Nome Completo</label>
-        <input type="text" id="reg-name" placeholder="Como quer ser chamado?">
-      </div>
-      <div class="field">
-        <label>Usuário</label>
-        <input type="text" id="reg-user" placeholder="Ex: player123">
-      </div>
-      <div class="field">
-        <label>Senha</label>
-        <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres">
-      </div>
-      <div class="field">
-        <label>Confirmar Senha</label>
-        <input type="password" id="reg-pass2" placeholder="Repita a senha">
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="doRegister()">CADASTRAR</button>
-      <p class="link-text">Já tem conta? <a onclick="showScreen('login')">Fazer login</a></p>
-    </div>
-  </section>
-
-  <!-- HOME / DASHBOARD -->
-  <section id="home" class="screen">
-    <div class="topbar">
-      <div class="topbar-logo">QuizZone</div>
-      <div class="topbar-user">
-        <div class="avatar" id="avatar-letter">M</div>
-        <div style="display:flex;flex-direction:column">
-          <span class="username-display" id="display-username">username</span>
-          <button class="btn-logout" onclick="doLogout()">Sair</button>
-        </div>
-      </div>
+  </div>
+  <div class="home-content">
+    <div class="welcome-banner">
+      <h3>Olá, <span id="welcome-name">Jogador</span>! 🔥</h3>
+      <p>Escolha um quiz e mostre o que você sabe!</p>
+      <div class="score-badge">⭐ Pontos totais: <span id="total-score">0</span></div>
     </div>
 
-    <div class="home-content">
-      <div class="welcome-banner">
-        <h3>Olá, <span id="welcome-name">Jogador</span>!</h3>
-        <p>Pronto para subir no ranking hoje?</p>
-        <div class="score-badge">🏆 <span id="total-score">0</span> PONTOS TOTAIS</div>
+    <div class="section-title">🎮 Escolha um Quiz</div>
+    <div class="games-grid">
+      <div class="game-card" style="--game-color: rgba(255,107,107,0.08)" onclick="startGame('cultura')">
+        <span class="game-icon">🌍</span>
+        <h3>Cultura Geral</h3>
+        <p>Teste seus conhecimentos sobre o mundo, história e atualidades!</p>
+        <span class="game-tag" style="background:rgba(255,107,107,0.2);color:var(--accent1)">10 perguntas</span>
       </div>
-
-      <h2 class="section-title">Escolha um Desafio</h2>
-      <div class="games-grid">
-        <div class="game-card" style="--game-color: rgba(255,217,61,0.1)" onclick="startGame('cultura')">
-          <span class="game-icon">🌍</span>
-          <h3>Cultura Geral</h3>
-          <p>História, geografia e conhecimentos do mundo.</p>
-          <span class="game-tag" style="background:var(--accent2);color:#1a1535">Popular</span>
-        </div>
-        <div class="game-card" style="--game-color: rgba(107,203,119,0.1)" onclick="startGame('ciencias')">
-          <span class="game-icon">🔬</span>
-          <h3>Ciências</h3>
-          <p>Natureza, corpo humano e o universo.</p>
-          <span class="game-tag" style="background:var(--accent3);color:white">Educativo</span>
-        </div>
-        <div class="game-card" style="--game-color: rgba(77,150,255,0.1)" onclick="startGame('games')">
-          <span class="game-icon">🕹️</span>
-          <h3>Mundo Gamer</h3>
-          <p>Consoles, personagens e história dos jogos.</p>
-          <span class="game-tag" style="background:var(--accent4);color:white">Divertido</span>
-        </div>
-        <div class="game-card" style="--game-color: rgba(199,125,255,0.1)" onclick="startGame('pop')">
-          <span class="game-icon">🎵</span>
-          <h3>Cultura Pop</h3>
-          <p>Filmes, séries, música e celebridades.</p>
-          <span class="game-tag" style="background:var(--purple);color:white">Trend</span>
-        </div>
+      <div class="game-card" style="--game-color: rgba(255,217,61,0.08)" onclick="startGame('ciencias')">
+        <span class="game-icon">🔬</span>
+        <h3>Ciências & Natureza</h3>
+        <p>Espaço, animais, biologia e descobertas incríveis!</p>
+        <span class="game-tag" style="background:rgba(255,217,61,0.2);color:var(--accent2)">10 perguntas</span>
       </div>
-
-      <h2 class="section-title">Últimas Partidas</h2>
-      <div class="card" style="max-width:100%; padding:20px" id="history-list">
-        <!-- History items here -->
+      <div class="game-card" style="--game-color: rgba(107,203,119,0.08)" onclick="startGame('games')">
+        <span class="game-icon">🕹️</span>
+        <h3>Mundo dos Games</h3>
+        <p>Você conhece os maiores jogos e personagens do universo gamer?</p>
+        <span class="game-tag" style="background:rgba(107,203,119,0.2);color:var(--accent3)">10 perguntas</span>
       </div>
-    </div>
-  </section>
-
-  <!-- GAME SCREEN -->
-  <section id="game" class="screen">
-    <div class="game-topbar">
-      <div class="game-title-bar" id="game-title-bar">Categoria</div>
-      <div class="game-meta">
-        <div class="timer-badge" id="timer-display">15</div>
-        <div class="score-display">✨ <span id="game-score">0</span></div>
+      <div class="game-card" style="--game-color: rgba(77,150,255,0.08)" onclick="startGame('pop')">
+        <span class="game-icon">🎵</span>
+        <h3>Cultura Pop</h3>
+        <p>Músicas, filmes, séries e tudo que está em alta!</p>
+        <span class="game-tag" style="background:rgba(77,150,255,0.2);color:var(--accent4)">10 perguntas</span>
       </div>
     </div>
 
-    <div class="game-content">
-      <div class="q-card">
-        <div class="q-header">
-          <span class="q-num" id="q-number">Pergunta 1 de 10</span>
-          <div class="progress-container">
-            <div class="progress-bar" id="progress-bar"></div>
-          </div>
-        </div>
-        <div class="q-body">
-          <span class="q-emoji" id="q-emoji">❓</span>
-          <h2 class="q-text" id="q-text">Carregando pergunta...</h2>
-          <div class="options-grid" id="options-grid">
-            <!-- Options here -->
-          </div>
-        </div>
-      </div>
+    <div class="section-title">🏆 Seu Histórico</div>
+    <div id="history-list" style="color:var(--muted); font-size:14px; background:var(--card); border-radius:14px; padding:20px; border:1px solid rgba(255,255,255,0.06)">
+      Nenhuma partida jogada ainda. Comece agora!
     </div>
-  </section>
+  </div>
+</div>
 
-  <!-- RESULT SCREEN -->
-  <section id="result" class="screen">
-    <div class="card">
-      <div class="result-emoji" id="result-emoji">🏆</div>
-      <h2 id="result-title">Incrível!</h2>
-      <div class="result-stars" id="result-stars">⭐⭐⭐</div>
-      
-      <div class="result-score">
-        <span class="result-score-num" id="result-score-num">0</span>
-        <span class="result-score-label" id="result-detail">pontos</span>
-      </div>
-
-      <div class="btn-group" style="flex-direction:column; width:100%">
-        <button class="btn btn-primary" style="width:100%" onclick="restartGame()">JOGAR NOVAMENTE</button>
-        <button class="btn btn-secondary" style="width:100%" onclick="loadHome()">VOLTAR AO INÍCIO</button>
-      </div>
+<!-- GAME -->
+<div class="screen" id="game">
+  <div class="game-topbar">
+    <div class="game-title-bar" id="game-title-bar">Quiz</div>
+    <div class="game-meta">
+      <span class="score-display">⭐ <span id="game-score">0</span></span>
+      <span class="timer-badge" id="timer-display">15</span>
+      <button class="btn btn-secondary" style="padding:8px 18px; font-size:14px" onclick="showScreen('home')">✕ Sair</button>
     </div>
-  </section>
+  </div>
+  <div class="game-content">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+    </div>
+    <div class="question-card">
+      <div class="q-number" id="q-number">Pergunta 1 de 10</div>
+      <span class="q-emoji" id="q-emoji">❓</span>
+      <div class="q-text" id="q-text">Carregando...</div>
+    </div>
+    <div class="options-grid" id="options-grid"></div>
+  </div>
+</div>
 
-  <script>
-    // Star Background Generator
-    (function createStars() {
-      const container = document.getElementById('stars');
-      for (let i = 0; i < 100; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.top = Math.random() * 100 + '%';
-        star.style.animationDelay = Math.random() * 3 + 's';
-        container.appendChild(star);
-      }
-    })();
-  </script>
-  <script src="script.js"></script>
+<!-- RESULT -->
+<div class="screen" id="result">
+  <div class="result-emoji" id="result-emoji">🏆</div>
+  <div class="result-card">
+    <div class="stars-display" id="result-stars">⭐⭐⭐</div>
+    <h2 id="result-title">Incrível!</h2>
+    <div class="result-score" id="result-score-num">1000</div>
+    <div class="result-detail" id="result-detail">pontos</div>
+    <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center">
+      <button class="btn btn-yellow" onclick="restartGame()">🔁 Jogar de novo</button>
+      <button class="btn btn-secondary" onclick="showScreen('home')">🏠 Início</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

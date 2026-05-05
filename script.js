@@ -1,3 +1,14 @@
+// ===== STARS =====
+(function() {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s;opacity:${Math.random()*0.6+0.2}`;
+    c.appendChild(s);
+  }
+})();
+
 // ===== DATABASE (localStorage) =====
 const DB = {
   getUsers() { return JSON.parse(localStorage.getItem('qz_users') || '{}'); },
@@ -73,6 +84,7 @@ const QUESTIONS = {
 const GAME_NAMES = { cultura:'Cultura Geral', ciencias:'Ciências & Natureza', games:'Mundo dos Games', pop:'Cultura Pop' };
 const GAME_EMOJIS = { cultura:'🌍', ciencias:'🔬', games:'🕹️', pop:'🎵' };
 
+// ===== STATE =====
 let currentUser = null;
 let currentGame = null;
 let currentQ = 0;
@@ -82,6 +94,7 @@ let timeLeft = 15;
 let answered = false;
 let currentCategory = '';
 
+// ===== UTILS =====
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -97,6 +110,7 @@ function showSuccess(id, msg) {
   el.textContent = msg; el.style.display = 'block';
 }
 
+// ===== AUTH =====
 function doRegister() {
   const name = document.getElementById('reg-name').value.trim();
   const user = document.getElementById('reg-user').value.trim().toLowerCase();
@@ -164,6 +178,7 @@ function loadHistory() {
   `).join('');
 }
 
+// ===== GAME =====
 function startGame(category) {
   currentCategory = category;
   currentGame = [...QUESTIONS[category]].sort(() => Math.random() - 0.5);
@@ -179,19 +194,19 @@ function renderQuestion() {
   answered = false;
   const q = currentGame[currentQ];
   const total = currentGame.length;
-  document.getElementById('q-number').textContent = \`Pergunta \${currentQ + 1} de \${total}\`;
+  document.getElementById('q-number').textContent = `Pergunta ${currentQ + 1} de ${total}`;
   document.getElementById('q-emoji').textContent = q.e;
   document.getElementById('q-text').textContent = q.q;
-  document.getElementById('progress-bar').style.width = \`\${(currentQ / total) * 100}%\`;
+  document.getElementById('progress-bar').style.width = `${(currentQ / total) * 100}%`;
   document.getElementById('game-score').textContent = score;
 
   const grid = document.getElementById('options-grid');
   const letters = ['A','B','C','D'];
-  grid.innerHTML = q.o.map((opt, i) => \`
-    <button class="option-btn" onclick="selectAnswer(\${i})">
-      <span class="opt-letter">\${letters[i]}</span> \${opt}
+  grid.innerHTML = q.o.map((opt, i) => `
+    <button class="option-btn" onclick="selectAnswer(${i})">
+      <span class="opt-letter">${letters[i]}</span> ${opt}
     </button>
-  \`).join('');
+  `).join('');
 
   startTimer();
 }
@@ -269,8 +284,9 @@ function endGame() {
   document.getElementById('result-title').textContent = title;
   document.getElementById('result-stars').textContent = stars;
   document.getElementById('result-score-num').textContent = score;
-  document.getElementById('result-detail').textContent = \`pontos em \${GAME_NAMES[currentCategory]}\`;
+  document.getElementById('result-detail').textContent = `pontos em ${GAME_NAMES[currentCategory]}`;
 
+  // Save
   const users = DB.getUsers();
   users[currentUser].totalScore = (users[currentUser].totalScore || 0) + score;
   DB.saveUsers(users);
@@ -285,6 +301,7 @@ function endGame() {
   showScreen('result');
 }
 
+// ===== INIT =====
 (function init() {
   const session = DB.getSession();
   if (session) {
